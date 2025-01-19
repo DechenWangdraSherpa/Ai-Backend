@@ -1,6 +1,5 @@
 const express = require("express");
-const WebSocket = require("ws"); // WebSocket library for handling WebSocket connections
-const cors = require("cors"); // CORS for handling cross-origin requests
+const cors = require("cors");
 
 const app = express();
 
@@ -13,7 +12,7 @@ app.use(cors()); // Enable CORS for all routes
 // In-memory storage for the latest data received from the dataTransmitter
 let latestData = {};
 
-// Endpoint for receiving data from dataTransmitter.py
+// Endpoint for receiving data from dataTransmitter
 app.post("/api/receive-data", (req, res) => {
   try {
     const incomingData = req.body;
@@ -52,26 +51,6 @@ app.get("/api/data", (req, res) => {
     },
     camera: latestData.video_frame || "No video available",
   });
-});
-
-// WebSocket client to connect to a dummy server (optional, based on your architecture)
-const dummyServerUrl = "ws://127.0.0.1:8765"; // WebSocket server address
-const ws = new WebSocket(dummyServerUrl);
-
-// When the WebSocket client connects
-ws.on("open", () => {
-  console.log("Connected to the dummy server WebSocket");
-});
-
-// Handle messages from the dummy server
-ws.on("message", (data) => {
-  try {
-    const parsedData = JSON.parse(data);
-    latestData = parsedData; // Store the latest data
-    console.log("Data from dummy server:", parsedData);
-  } catch (error) {
-    console.error("Error parsing data from dummy server:", error.message);
-  }
 });
 
 // Start the server
