@@ -1,0 +1,100 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Vehicle {
+  VehicleID  Int   @id@default(autoincrement())
+  Name       String   @db.VarChar(100)
+  Model       String? @db.VarChar(50)
+  CreatedAt        DateTime @default(now())
+
+
+  sensorData SensorData[]
+  cameras Camera[]
+  gpsData GPSData[]
+  imuData IMUData[]
+  environmentalData EnvironmentalData[]
+  lidarData LidarData[]
+}
+
+model SensorData {
+  SensorDataID  Int   @id@default(autoincrement())
+  VehicleID  Int
+  Timestamp       DateTime @default(now())
+  SensorType          String @db.VarChar(50)
+  SensorValue          Json
+
+  vehicle Vehicle @relation(fields: [VehicleID], references:[VehicleID])
+  @@index([VehicleID])
+}
+
+model Camera {
+  CameraID  Int   @id@default(autoincrement())
+  VehicleID  Int
+  Timestamp       DateTime @default(now())
+  FilePath  String  @db.VarChar(255)
+  Metadata  Json?
+
+  vehicle Vehicle @relation(fields: [VehicleID], references:[VehicleID])
+  @@index([VehicleID])
+}
+
+model GPSData {
+  GPSDataID  Int   @id@default(autoincrement())
+  VehicleID  Int
+  Timestamp       DateTime @default(now())
+  Latitude        Float
+  Longitude       Float
+  Altitude        Float?
+
+  vehicle Vehicle @relation(fields: [VehicleID], references:[VehicleID])
+  @@index([VehicleID])
+}
+
+model IMUData {
+  IMUDataID  Int   @id@default(autoincrement())
+  VehicleID  Int
+  Timestamp       DateTime @default(now())
+  AccelerometerX Float?
+  AccelerometerY Float?
+  AccelerometerZ Float?
+  GyroscopeX     Float?
+  GyroscopeY     Float?
+  GyroscopeZ     Float?
+
+  vehicle Vehicle @relation(fields: [VehicleID], references:[VehicleID])
+  @@index([VehicleID])
+}
+
+model EnvironmentalData {
+  EnvironmentalDataID  Int   @id@default(autoincrement())
+  VehicleID  Int
+  Timestamp       DateTime @default(now())
+  Temperature       Float?
+  Humidity          Float?
+
+  vehicle Vehicle @relation(fields: [VehicleID], references:[VehicleID])
+  @@index([VehicleID])
+}
+
+model LidarData {
+  LidarDataID  Int   @id@default(autoincrement())
+  VehicleID  Int
+  Timestamp       DateTime @default(now())
+  LidarPoints  Json
+  MetaData  Json?
+
+  vehicle Vehicle @relation(fields: [VehicleID], references:[VehicleID])
+  @@index([VehicleID])
+}
